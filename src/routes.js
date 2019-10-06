@@ -4,9 +4,9 @@ const cors = require('cors');
 
 router.all('*', cors());
 
-router.get('/', (request, response) => {
-    response.json({
-        info: 'Welcome to the API'
+router.get('/', (req, res) => {
+    res.json({
+        info: 'Welcome to the finanzas API'
     });
 });
 
