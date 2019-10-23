@@ -18,6 +18,12 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
+    password: {
+        type: String,
+        required: true,
+        minlength: 8,
+        trim: true
+    },
     tokens: [{
         token: {
             type: String,
@@ -32,6 +38,12 @@ const userSchema = new mongoose.Schema({
         virtuals: true
     }
 })
+
+userSchema.virtual('accounts', {
+    ref: 'Account',
+    localField: '_id',
+    foreignField: 'ownedBy'
+});
 
 userSchema.methods.toJSON = function () {
     const user = this
