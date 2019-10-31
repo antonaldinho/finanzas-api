@@ -5,6 +5,7 @@ const cors = require('cors');
 const auth = require('./middleware/auth');
 const users = require('./controllers/users');
 const accounts = require('./controllers/accounts');
+const moves = require('./controllers/moves');
 
 router.all('*', cors());
 
@@ -25,5 +26,9 @@ router.post('/accounts', auth, accounts.createAccount);
 router.patch('/accounts/:id', auth, accounts.updateAccount);
 router.delete('/accounts/:id', auth, accounts.deleteAccount);
 
+router.get('/moves', auth, moves.getUserMoves);
+router.get('/moves/account/:id', auth, moves.getAccountMoves);
+router.post('/moves', auth, moves.createMove);
+router.delete('/moves/:id', auth, moves.deleteMove);
 
 module.exports = router;

@@ -1,11 +1,8 @@
 const mongoose = require('mongoose');
 
 const supportedTypes = ['income', 'expense', 'transfer'];
+const supportedCategories = ['food/drinks', 'shopping', 'housing', 'transportation', 'vehicle', 'entertainment', 'communication/pc', 'financialExpenses', 'investments', 'income', 'others'];
 const moveSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
     type: {
         type: String,
         required: true,
@@ -18,6 +15,15 @@ const moveSchema = new mongoose.Schema({
     amount: {
         type: Number,
         required: true
+    },
+    category: {
+        type: String,
+        required: true,
+        validate(value) {
+            if (!supportedCategories.includes(value)) {
+                throw new Error('Invalid category');
+            }
+        }
     },
     date: {
         type: Date,
@@ -34,12 +40,17 @@ const moveSchema = new mongoose.Schema({
     origin: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'Origin'
+        ref: 'Account'
     },
     destination: {
         type: mongoose.Schema.Types.ObjectId,
         required: false,
-        ref: 'Destination'
+        ref: 'Account'
+    },
+    ownedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
     }
 })
 

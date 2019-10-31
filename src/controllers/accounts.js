@@ -13,21 +13,27 @@ const getAccounts = function (req, res) {
 
 const getAccount = function (req, res) {
     const _id = req.params.id;
-    Account.findOne({ _id, ownedBy: req.user._id })
-        .then(account => {
-            if (!account) {
-                return res.status(404).send({ error: `Account with id ${_id} not found.` });
-            }
-            return res.send(account);
-        })
-        .catch(error => {
-            res.status(500).send(error);
-        });
+    // Account.findOne({ _id, ownedBy: req.user._id })
+    //     .then(account => {
+    //         if (!account) {
+    //             return res.status(404).send({ error: `Account with id ${_id} not found.` });
+    //         }
+    //         return res.send(account);
+    //     })
+    //     .catch(error => {
+    //         res.status(500).send(error);
+    //     });
+    Account.findOne({_id, ownedBy: req.user}).populate('moves').exec((error, account) => {
+        if(error) {
+            return res.status(400).send(error);
+        }
+        return res.send(account);
+    })
 }
 
 const createAccount = function (req, res) {
-    console.log((!req.body.name || !req.body.balance || !req.body.type));
-    if (!req.body.name || !req.body.balance || !req.body.type) {
+    console.log((!req.body.name || req.body.balance === undefined || !req.body.type));
+    if (!req.body.name || req.body.balance === undefined || !req.body.type) {
         return res.status(400).send({ error: 'Missing parameters' });
     }
     let description = '';
