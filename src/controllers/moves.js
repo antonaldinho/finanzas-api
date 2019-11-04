@@ -123,14 +123,52 @@ const updateMove = function (req, res) {
             error: 'Invalid update, only allowed to update: ' + allowedUpdates
         })
     }
+    //Update el move seleccionado
     Move.findByIdAndUpdate(_id, req.body).then(function (move) {
         if (!move) {
             return res.status(404).send()
         }
-        return res.send(move)
     }).catch(function (error) {
         res.status(500).send(error);
     })
+    //Saca el account id para modificar el account
+    Move.findById(_id, function (err, move) {
+        const prevAmount = move.amount
+        const accountId = move.origin
+        const moveType = move.type
+        Account.findById(accountId, function (err, acc) {
+            balance = acc.balance
+            var amount = req.body.amount - prevAmount
+            var newAmount = {}
+            if (moveType === "expense" && req.body.type === "income") {
+                newAmount = {
+                    'balance': balance + prevAmount + amount
+                }
+            } else if (moveType === "income" && req.body.type === "expense") {
+                newAmount = {
+                    'balance': balance - prevAmount - amount
+                }
+            } else if (moveType === "income") {
+                newAmount = {
+                    'balance': balance + amount
+                }
+            } else {
+                newAmount = {
+                    'balance': balance - amount
+                }
+            }
+            console.log(newAmount)
+            Account.findByIdAndUpdate(accountId, newAmount).then(function (acc) {
+                if (!acc) {
+                    return res.status(404).send()
+                }
+                return res.send(acc)
+            }).catch(function (error) {
+                res.status(500).send(error);
+            })
+        })
+    })
+
 }
 module.exports = {
     createMove: createMove,
