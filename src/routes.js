@@ -30,5 +30,6 @@ router.get('/moves', auth, moves.getUserMoves);
 router.get('/moves/account/:id', auth, moves.getAccountMoves);
 router.post('/moves', auth, moves.createMove);
 router.delete('/moves/:id', auth, moves.deleteMove);
+router.patch('/moves/:id', auth, moves.updateMove);
 
 module.exports = router;
