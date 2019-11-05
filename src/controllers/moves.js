@@ -77,8 +77,8 @@ const createMove = function (req, res) {
 const getAccountMoves = (req, res) => {
     const _id = req.params.id;
     Move.find({
-            origin: _id
-        })
+        origin: _id
+    })
         .then(moves => {
             return res.send(moves);
         }).catch(error => {
@@ -88,8 +88,8 @@ const getAccountMoves = (req, res) => {
 
 const getUserMoves = (req, res) => {
     Move.find({
-            ownedBy: req.user._id
-        })
+        ownedBy: req.user._id
+    })
         .then(moves => {
             return res.send(moves);
         }).catch(error => {
@@ -123,14 +123,115 @@ const updateMove = function (req, res) {
             error: 'Invalid update, only allowed to update: ' + allowedUpdates
         })
     }
-    Move.findByIdAndUpdate(_id, req.body).then(function (move) {
-        if (!move) {
-            return res.status(404).send()
-        }
-        return res.send(move)
-    }).catch(function (error) {
-        res.status(500).send(error);
-    })
+    //Update el move seleccionado
+    Move.findById(_id)
+        .then(move => {
+            const prevType = move.type;
+            const prevAmount = move.amount;
+            const currAmount = req.body.amount;
+            const currType = req.body.type !== undefined ? req.body.type : prevType;
+            if (prevType !== currType) {
+                if (prevType === 'income' && currType === 'expense') {
+                    Account.findById(move._id)
+                        .then(account => {
+                            let newBalance = account.balance - prevAmount - currAmount;
+                            const update = { balance: newBalance < 0 ? 0 : newBalance }
+                            Account.findByIdAndUpdate(move.origin, update)
+                                .then(acc => {
+                                    Move.findByIdAndUpdate(_id, req.body)
+                                        .then(move => {
+                                            return res.send({
+                                                msg: 'Move and account updated',
+                                                move
+                                            })
+                                        }).catch(err => {
+                                            return res.status(400).send(err);
+                                        });
+                                }).catch(err => {
+                                    return res.status(400).send(err);
+                                });
+                        }).catch(err => {
+                            return res.status(400).send(err);
+                        });
+                }
+                else if (prevType === 'expense' && currType === 'income') {
+                    Account.findById(move.origin)
+                        .then(account => {
+                            let newBalance = account.balance + prevAmount + currAmount;
+                            const update = { balance: newBalance }
+                            Account.findByIdAndUpdate(move.origin, update)
+                                .then(acc => {
+                                    Move.findByIdAndUpdate(_id, req.body)
+                                        .then(move => {
+                                            return res.send({
+                                                msg: 'Move and account updated',
+                                                move
+                                            })
+                                        }).catch(err => {
+                                            return res.status(400).send(err);
+                                        });
+                                }).catch(err => {
+                                    return res.status(400).send(err);
+                                });
+                        }).catch(err => {
+                            return res.status(400).send(err);
+                        });
+                }
+                else {
+                    return res.status(400).send({ msg: 'Cannot change from income/expense to transfer' })
+                }
+            }
+            else {
+                if (prevType === 'income') {
+                    Account.findById(move.origin)
+                        .then(account => {
+                            let newBalance = account.balance - prevAmount + currAmount;
+                            const update = { balance: newBalance < 0 ? 0 : newBalance }
+                            Account.findByIdAndUpdate(move.origin, update)
+                                .then(acc => {
+                                    Move.findByIdAndUpdate(_id, req.body)
+                                        .then(move => {
+                                            return res.send({
+                                                msg: 'Move and account updated',
+                                                move
+                                            })
+                                        }).catch(err => {
+                                            return res.status(400).send(err);
+                                        });
+                                }).catch(err => {
+                                    return res.status(400).send(err);
+                                });
+                        }).catch(err => {
+                            return res.status(400).send(err);
+                        });
+                }
+                else {
+                    Account.findById(move.origin)
+                        .then(account => {
+                            let newBalance = account.balance + prevAmount - currAmount;
+                            const update = { balance: newBalance < 0 ? 0 : newBalance }
+                            Account.findByIdAndUpdate(move.origin, update)
+                                .then(acc => {
+                                    Move.findByIdAndUpdate(_id, req.body)
+                                        .then(move => {
+                                            return res.send({
+                                                msg: 'Move and account updated',
+                                                move
+                                            })
+                                        }).catch(err => {
+                                            return res.status(400).send(err);
+                                        });
+                                }).catch(err => {
+                                    return res.status(400).send(err);
+                                });
+                        }).catch(err => {
+                            return res.status(400).send(err);
+                        });
+                }
+            }
+        }).catch(err => {
+            return res.status(400).send({msg: 'lol', error: err});
+        });
 }
 module.exports = {
     createMove: createMove,
