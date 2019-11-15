@@ -18,6 +18,7 @@ router.get('/', (req, res) => {
 router.get('/users', auth, users.getUser);
 router.post('/users', users.createUser);
 router.post('/users/login', users.login);
+router.patch('/users', auth, users.updateUser);
 router.post('/users/logout', auth, users.logout);
 
 router.get('/accounts', auth, accounts.getAccounts);
@@ -30,5 +31,6 @@ router.get('/moves', auth, moves.getUserMoves);
 router.get('/moves/account/:id', auth, moves.getAccountMoves);
 router.post('/moves', auth, moves.createMove);
 router.delete('/moves/:id', auth, moves.deleteMove);
+router.patch('/moves/:id', auth, moves.updateMove);
 
 module.exports = router;
