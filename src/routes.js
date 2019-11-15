@@ -18,6 +18,7 @@ router.get('/', (req, res) => {
 router.get('/users', auth, users.getUser);
 router.post('/users', users.createUser);
 router.post('/users/login', users.login);
+router.patch('/users', auth, users.updateUser);
 router.post('/users/logout', auth, users.logout);
 
 router.get('/accounts', auth, accounts.getAccounts);
