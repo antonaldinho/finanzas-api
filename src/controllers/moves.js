@@ -233,10 +233,30 @@ const updateMove = function (req, res) {
             return res.status(400).send({msg: 'lol', error: err});
         });
 }
+
+//get last 30 days total balance
+const getDailyBalance = function (req, res) {
+
+    var date = new Date();
+    var dateInit = new Date();
+    dateInit.setMonth(dateInit.getMonth() -1 )
+    date.setDate(date.getDate()); 
+
+    Move.find({
+        ownedBy: req.user._id, date:{$gte:dateInit, $lt:date}
+    }).sort({date: 1})
+        .then(moves => {
+            return res.send(moves);
+        }).catch(error => {
+            return res.status(400).send(error);
+        });
+}
+
 module.exports = {
     createMove: createMove,
     getAccountMoves: getAccountMoves,
     getUserMoves: getUserMoves,
     deleteMove: deleteMove,
-    updateMove: updateMove
+    updateMove: updateMove,
+    getDailybalance: getDailyBalance
 }
