@@ -32,5 +32,6 @@ router.get('/moves/account/:id', auth, moves.getAccountMoves);
 router.post('/moves', auth, moves.createMove);
 router.delete('/moves/:id', auth, moves.deleteMove);
 router.patch('/moves/:id', auth, moves.updateMove);
+router.get('/moves/daily-balance', auth, moves.getDailybalance);
 
 module.exports = router;
