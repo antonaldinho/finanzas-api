@@ -230,7 +230,7 @@ const updateMove = function (req, res) {
                 }
             }
         }).catch(err => {
-            return res.status(400).send({msg: 'lol', error: err});
+            return res.status(400).send({ msg: 'lol', error: err });
         });
 }
 
@@ -239,12 +239,12 @@ const getDailyBalance = function (req, res) {
 
     var date = new Date();
     var dateInit = new Date();
-    dateInit.setMonth(dateInit.getMonth() -1 )
-    date.setDate(date.getDate()); 
+    dateInit.setMonth(dateInit.getMonth() - 1)
+    date.setDate(date.getDate());
 
     Move.find({
-        ownedBy: req.user._id, date:{$gte:dateInit, $lt:date}
-    }).sort({date: 1})
+        ownedBy: req.user._id, date: { $gte: dateInit, $lt: date }
+    }).sort({ date: 1 })
         .then(moves => {
             return res.send(moves);
         }).catch(error => {
